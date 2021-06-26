@@ -1,48 +1,61 @@
 import React, { Component, useState, useEffect } from "react";
 import "./App.css";
 import { useHistory } from "react-router-dom";
-// import { useDispatch, useSelector } from "react-redux";
-// import { login } from "./logic/actions/actions";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "./logic/actions/actions";
 
 import axios from "axios";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const history = useHistory();
-  // const dispatch = useDispatch();
+  
   const [loading, setloading] = React.useState(false);
 
   const [email, setemail] = React.useState("");
 
   const [errormsg, seterrormsg] = React.useState("");
+  const [emailmsg, setemailMsg] = React.useState("");
+  const [passmsg, setpassMsg] = React.useState("");
   const [successmsg, setSuccessMsg] = React.useState("");
   const [password, setpassword] = React.useState("");
 
   const handleChange = (event) => {
     if (event.target.name == "email") {
+      console.log("here -", event.target.value);
       setemail(event.target.value);
       if (event.target.value.length == "") {
-        seterrormsg("Enter email");
+        setemailMsg("Enter email");
+      } else {
+        setemailMsg("");
       }
     }
     if (event.target.name == "password") {
       setpassword(event.target.value);
-      if (event.target.value.length == "") {
-        seterrormsg("Enter password");
+      if (event.target.value == "") {
+        setpassMsg("Enter password");
+      } else if (password.length < 7) {
+        setpassMsg("Please enter min 8 chars");
+      } else {
+        setpassMsg("");
       }
     }
-
-    seterrormsg("");
-    // setSuccessMsg("");
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setloading(true);
-
     try {
-      setloading(false);
-      window.localStorage.setItem("login", true);
-      history.push("/");
+      setTimeout(function () {
+        if (!passmsg && !errormsg) {
+          localStorage.setItem("login", true);
+          dispatch(login({ username: "" }));
+          history.push("/");
+        } else {
+          setloading(false);
+          seterrormsg("something went wrong!!");
+        }
+      }, 2000);
     } catch (err) {
       setloading(false);
       console.log("errrprr--", err.response.data.error);
@@ -51,55 +64,58 @@ const Login = () => {
   };
 
   return (
-    <div class="login-wrap">
-      <div class="login-html">
-        <input id="tab-1" type="radio" name="tab" class="sign-in" checked />
-        <label for="tab-1" class="tab">
+    <div className="login-wrap">
+      <div className="login-html">
+        <input id="tab-1" type="radio" name="tab" className="sign-in" />
+        <label htmlFor="tab-1" className="tab">
           Sign In
         </label>
-        <div class="login-form">
-          <div class="sign-in-htm">
-            <div class="group">
-              <label for="user" class="label">
+        <div className="login-form">
+          <div className="sign-in-htm">
+            <div className="group">
+              <label htmlFor="user" className="label">
                 Email
               </label>
               <input
                 id="user"
                 type="email"
-                class="input"
+                className="input"
                 name="email"
                 value={email}
-                required
                 onChange={handleChange}
               />
-            {errormsg ? <div className="text-danger">{errormsg}</div> : null}
+              {emailmsg ? <div className="text-danger">{emailmsg}</div> : null}
             </div>
-            <div class="group">
-              <label for="pass" class="label">
+            <div className="group">
+              <label htmlFor="pass" className="label">
                 Password
               </label>
               <input
                 id="pass"
                 type="password"
-                class="input"
+                className="input"
                 name="password"
                 value={password}
-                data-type="password"
+                onChange={handleChange}
               />
-              {errormsg ? <div className="text-danger">{errormsg}</div> : null}
+              {passmsg ? <div className="text-danger">{passmsg}</div> : null}
             </div>
 
-            <div class="group">
+            <div className="group">
               <input
-                type="submit"
-                class="button"
+                type="button"
+                className="button"
                 value={loading ? "Please wait..." : "SignIn"}
-                onChange={handleSubmit}
+                onClick={handleSubmit}
               />
             </div>
-            {errormsg ? <div className="text-danger">{errormsg}</div> : null}
-            {/* <div class="hr"></div>
-            <div class="foot-lnk">
+            {errormsg ? (
+              <div className="text-danger" style={{ textAlign: "center" }}>
+                {errormsg}
+              </div>
+            ) : null}
+            {/* <div className="hr"></div>
+            <div className="foot-lnk">
               <a href="#forgot">Forgot Password?</a>
             </div> */}
           </div>

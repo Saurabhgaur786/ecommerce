@@ -1,9 +1,20 @@
 import "./App.css";
 import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "./logic/actions/actions";
 
 const Header = () => {
-  let loggedIn = false;
+  // const [loggedIn, setloggedIn] = useState(false);
+  const loggedIn = useSelector((state) => state.user.loggedIn);
+
+  const dispatch = useDispatch();
   const history = useHistory();
+
+  const logoutUser = () => {
+    localStorage.removeItem("login");
+    dispatch(logout());
+    history.push("/login");
+  };
 
   return (
     <div className="main-head">
@@ -12,14 +23,16 @@ const Header = () => {
           <img src="./img/pf.jpg" />
         </div>
         <div className="navbar">
-          <div className="mycarts">Mycarts</div>
-          <div className="mycarts">Dashboard</div>
-          <div className="mycarts">Checkout</div>
+          <div className="mycarts" onClick={() => history.push("/")}>
+            Products
+          </div>
+          <div className="mycarts">Carts</div>
+          {/* <div className="mycarts">Checkout</div> */}
         </div>
 
         {loggedIn ? (
           <div>
-            <button onClick={() => history.push("/login")}>Logout</button>
+            <button onClick={logoutUser}>Logout</button>
           </div>
         ) : (
           <div>
